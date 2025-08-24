@@ -9,8 +9,7 @@ st.markdown(
     """
     <style>
         .stApp {
-            background-color: white; /* keep default */
-            color: black; /* set text to black */
+            background: linear-gradient(to bottom, #e0f7fa, #ffffff);
         }
         .big-font {
             font-size:20px !important;
@@ -115,6 +114,7 @@ if st.sidebar.button("Get Weather"):
             ax.set_ylabel(f"Temperature ({unit})")
             ax.grid(True, linestyle="--", alpha=0.6)
             st.pyplot(fig)
+
 
 
 
