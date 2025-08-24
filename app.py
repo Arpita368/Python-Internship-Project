@@ -9,28 +9,29 @@ st.markdown(
     """
     <style>
         .stApp {
-            background: linear-gradient(to bottom, #334155, #1e293b); /* softer blue-gray gradient */
-            color: #f1f5f9; /* light text */
+            background-color: white; /* keep default */
+            color: black; /* set text to black */
         }
         .big-font {
             font-size:20px !important;
-            color: #f8fafc;
+            color: black;
         }
         .weather-card {
-            background-color: rgba(255, 255, 255, 0.15); /* a bit brighter card */
-            color: #f8fafc; 
+            background-color: rgba(240, 240, 240, 0.8); /* light gray card */
+            color: black;
             padding: 15px;
             border-radius: 12px;
-            box-shadow: 1px 1px 6px rgba(0,0,0,0.3); /* softer shadow */
+            box-shadow: 1px 1px 6px rgba(0,0,0,0.2);
             margin-bottom: 10px;
         }
         h1, h2, h3, h4, h5, h6 {
-            color: #f8fafc;
+            color: black;
         }
     </style>
     """,
     unsafe_allow_html=True
 )
+
 
 
 
@@ -114,5 +115,6 @@ if st.sidebar.button("Get Weather"):
             ax.set_ylabel(f"Temperature ({unit})")
             ax.grid(True, linestyle="--", alpha=0.6)
             st.pyplot(fig)
+
 
 
