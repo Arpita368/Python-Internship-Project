@@ -9,19 +9,19 @@ st.markdown(
     """
     <style>
         .stApp {
-            background: linear-gradient(to bottom, #1e293b, #0f172a);
-            color: #f1f5f9;
+            background: linear-gradient(to bottom, #334155, #1e293b); /* softer blue-gray gradient */
+            color: #f1f5f9; /* light text */
         }
         .big-font {
             font-size:20px !important;
             color: #f8fafc;
         }
         .weather-card {
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: rgba(255, 255, 255, 0.15); /* a bit brighter card */
             color: #f8fafc; 
             padding: 15px;
             border-radius: 12px;
-            box-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+            box-shadow: 1px 1px 6px rgba(0,0,0,0.3); /* softer shadow */
             margin-bottom: 10px;
         }
         h1, h2, h3, h4, h5, h6 {
@@ -31,6 +31,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
 
 
 st.title("🌎 Weather Monitoring App")
@@ -113,4 +114,5 @@ if st.sidebar.button("Get Weather"):
             ax.set_ylabel(f"Temperature ({unit})")
             ax.grid(True, linestyle="--", alpha=0.6)
             st.pyplot(fig)
+
 
