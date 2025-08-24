@@ -8,31 +8,46 @@ st.set_page_config(page_title="Weather App", page_icon="⛅", layout="centered")
 st.markdown(
     """
     <style>
+        /* App background */
         .stApp {
             background: linear-gradient(to bottom, #e0f7fa, #ffffff);
+            color: #000000 !important; /* force black text */
         }
-        .big-font {
-            font-size:20px !important;
-            color: black;
+
+        /* General text */
+        .big-font, .stMarkdown, .stText, .stSubheader, .stHeader, .stCaption {
+            color: #000000 !important;
         }
+
+        /* Sidebar */
+        section[data-testid="stSidebar"] {
+            color: #000000 !important;
+        }
+
+        /* Headings */
+        h1, h2, h3, h4, h5, h6 {
+            color: #000000 !important;
+        }
+
+        /* Weather cards */
         .weather-card {
-            background-color: rgba(240, 240, 240, 0.8); /* light gray card */
-            color: black;
+            background-color: rgba(240, 240, 240, 0.9);
+            color: #000000 !important;
             padding: 15px;
             border-radius: 12px;
             box-shadow: 1px 1px 6px rgba(0,0,0,0.2);
             margin-bottom: 10px;
+            font-weight: 500;
         }
-        h1, h2, h3, h4, h5, h6 {
-            color: black;
+
+        /* Labels (radio, input, etc.) */
+        label, .stRadio, .stTextInput, .stSelectbox, .stButton {
+            color: #000000 !important;
         }
     </style>
     """,
     unsafe_allow_html=True
 )
-
-
-
 
 st.title("🌎 Weather Monitoring App")
 
@@ -114,6 +129,7 @@ if st.sidebar.button("Get Weather"):
             ax.set_ylabel(f"Temperature ({unit})")
             ax.grid(True, linestyle="--", alpha=0.6)
             st.pyplot(fig)
+
 
 
 
