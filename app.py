@@ -8,28 +8,20 @@ st.set_page_config(page_title="Weather App", page_icon="⛅", layout="centered")
 st.markdown(
     """
     <style>
-        /* App background */
         .stApp {
             background: linear-gradient(to bottom, #e0f7fa, #ffffff);
             color: #000000 !important; /* force black text */
         }
-
-        /* General text */
         .big-font, .stMarkdown, .stText, .stSubheader, .stHeader, .stCaption {
             color: #000000 !important;
         }
-
-        /* Sidebar */
         section[data-testid="stSidebar"] {
             color: #000000 !important;
         }
-
-        /* Headings */
         h1, h2, h3, h4, h5, h6 {
             color: #000000 !important;
         }
 
-        /* Weather cards */
         .weather-card {
             background-color: rgba(240, 240, 240, 0.9);
             color: #000000 !important;
@@ -40,7 +32,6 @@ st.markdown(
             font-weight: 500;
         }
 
-        /* Labels (radio, input, etc.) */
         label, .stRadio, .stTextInput, .stSelectbox, .stButton {
             color: #000000 !important;
         }
@@ -129,6 +120,7 @@ if st.sidebar.button("Get Weather"):
             ax.set_ylabel(f"Temperature ({unit})")
             ax.grid(True, linestyle="--", alpha=0.6)
             st.pyplot(fig)
+
 
 
 
