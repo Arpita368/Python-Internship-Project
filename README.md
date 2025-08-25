@@ -23,6 +23,11 @@ This is an interactive **Weather Monitoring Application** built with **Python** 
 
 ---
 
+## 🌐 Live Demo  
+We have made this project publicly accessible using **Streamlit Hosting**.  
+👉 [Try it here](https://python-internship-project-lcvveo38tuahfmjdurju4f.streamlit.app/)  
+
+---
 ## 📂 Project Structure  
 ```
 📦 Weather-App
