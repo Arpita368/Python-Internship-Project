@@ -1,144 +1,46 @@
-# 📊 Stock Analysis Dashboard
 import streamlit as st
 import yfinance as yf
 import pandas as pd
-import plotly.graph_objects as go
-from datetime import date
+import plotly.express as px
 
-st.set_page_config(page_title="📊 Stock Analysis Dashboard", layout="wide")
-st.title("📊 Stock Analysis Dashboard")
+st.title("Stock Analysis Dashboard")
 
-st.sidebar.header("Stock Input Options")
-popular_tickers = {
-    "Apple (AAPL)": "AAPL",
-    "Tesla (TSLA)": "TSLA",
-    "Microsoft (MSFT)": "MSFT",
-    "Amazon (AMZN)": "AMZN",
-    "Google (GOOGL)": "GOOGL",
-    "NVIDIA (NVDA)": "NVDA",
-    "Meta (META)": "META",
-    "Netflix (NFLX)": "NFLX",
-    "Infosys (INFY.BO)": "INFY.BO"
-}
+ticker = st.text_input("Enter Stock Ticker", "AAPL")
+start_date = st.date_input("Start Date", pd.to_datetime("2023-01-01"))
+end_date = st.date_input("End Date", pd.to_datetime("2023-06-30"))
 
-selected_tickers = st.sidebar.multiselect(
-    "Select Companies to Analyze:",
-    options=list(popular_tickers.keys()),
-    default=["Apple (AAPL)"]
-)
+if st.button("Fetch Data"):
+    data = yf.download(ticker, start=start_date, end=end_date, progress=False, threads=False)
 
-start_date = st.sidebar.date_input("Start Date", date(2023, 1, 1))
-end_date = st.sidebar.date_input("End Date", date.today())
+    if data.empty:
+        st.error("No data found. Adjust ticker or dates.")
+    else:
+        data.reset_index(inplace=True)
 
-if st.sidebar.button("Fetch Data"):
-    try:
-        tickers = [popular_tickers[name] for name in selected_tickers]
+        # RSI calculation replacement for SMA/EMA
+        delta = data['Close'].diff()
+        gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
+        loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
+        rs = gain / loss
+        data['RSI'] = 100 - (100 / (1 + rs))
 
-        if len(tickers) == 1:
-            ticker = tickers[0]
-            data = yf.download(ticker, start=start_date, end=end_date, progress=False)
+        # Line chart for Close price
+        fig_close = px.line(data, x='Date', y='Close', title=f"{ticker} Closing Price Trend")
+        st.plotly_chart(fig_close, use_container_width=True)
 
-            if data.empty:
-                st.error("⚠️ No data found for this stock.")
-            else:
-                data.index = pd.to_datetime(data.index)
+        # RSI line chart
+        fig_rsi = px.line(data, x='Date', y='RSI', title=f"{ticker} RSI (Relative Strength Index)")
+        st.plotly_chart(fig_rsi, use_container_width=True)
 
-                data['SMA20'] = data['Close'].rolling(window=20, min_periods=1).mean()
-                data['EMA20'] = data['Close'].ewm(span=20, adjust=False).mean()
+        # Performance summary
+        perf = {
+            "Start Price": data['Close'].iloc[0],
+            "End Price": data['Close'].iloc[-1],
+            "Change": data['Close'].iloc[-1] - data['Close'].iloc[0],
+            "Return %": ((data['Close'].iloc[-1] - data['Close'].iloc[0]) / data['Close'].iloc[0]) * 100
+        }
+        st.write("Performance Summary", perf)
 
-                delta = data['Close'].diff()
-                gain = delta.where(delta > 0, 0)
-                loss = -delta.where(delta < 0, 0)
-                avg_gain = gain.rolling(14, min_periods=1).mean()
-                avg_loss = loss.rolling(14, min_periods=1).mean()
-                rs = avg_gain / avg_loss.replace(0, pd.NA)
-                data['RSI'] = 100 - (100 / (1 + rs))
-                data['RSI'].fillna(50, inplace=True)
-
-                tab1, tab2, tab3, tab4 = st.tabs(
-                    ["📈 Candlestick", "📊 SMA & EMA", "📉 RSI", "📋 Summary"]
-                )
-
-                with tab1:
-                    fig1 = go.Figure(data=[go.Candlestick(
-                        x=data.index,
-                        open=data['Open'],
-                        high=data['High'],
-                        low=data['Low'],
-                        close=data['Close'],
-                        name="Candlestick"
-                    )])
-                    fig1.update_layout(
-                        title=f"{ticker} Candlestick Chart",
-                        xaxis_rangeslider_visible=False,
-                        template="plotly_white"
-                    )
-                    st.plotly_chart(fig1, use_container_width=True)
-
-                with tab2:
-                    fig2 = go.Figure()
-                    fig2.add_trace(go.Scatter(
-                        x=data.index, y=data['Close'],
-                        mode='lines', name='Close'
-                    ))
-                    fig2.add_trace(go.Scatter(
-                        x=data.index, y=data['SMA20'],
-                        mode='lines', name='SMA20'
-                    ))
-                    fig2.add_trace(go.Scatter(
-                        x=data.index, y=data['EMA20'],
-                        mode='lines', name='EMA20'
-                    ))
-                    fig2.update_layout(
-                        title=f"{ticker} Close with SMA & EMA",
-                        template="plotly_white"
-                    )
-                    st.plotly_chart(fig2, use_container_width=True)
-
-                with tab3:
-                    fig3 = go.Figure()
-                    fig3.add_trace(go.Scatter(
-                        x=data.index, y=data['RSI'],
-                        mode='lines', name='RSI'
-                    ))
-                    fig3.add_hline(y=70, line_dash="dash", line_color="red")
-                    fig3.add_hline(y=30, line_dash="dash", line_color="green")
-                    fig3.update_layout(
-                        title=f"{ticker} RSI (14-day)",
-                        template="plotly_white"
-                    )
-                    st.plotly_chart(fig3, use_container_width=True)
-
-                with tab4:
-                    close_prices = data['Close'].dropna()
-                    start_price = float(close_prices.iloc[0])
-                    end_price = float(close_prices.iloc[-1])
-                    ret = ((end_price / start_price) - 1) * 100
-                    col1, col2, col3 = st.columns(3)
-                    col1.metric("Start Price", f"{start_price:.2f}")
-                    col2.metric("End Price", f"{end_price:.2f}")
-                    col3.metric("Return %", f"{ret:.2f}%")
-
-                st.download_button(
-                    label="💾 Download Data as CSV",
-                    data=data.to_csv().encode('utf-8'),
-                    file_name=f"{ticker}_stock_analysis.csv",
-                    mime="text/csv",
-                )
-
-        elif len(tickers) > 1:
-            st.subheader("📊 Multi-Stock Comparison")
-            data_all = yf.download(tickers, start=start_date, end=end_date, progress=False)['Close']
-            if not data_all.empty:
-                fig_comp = go.Figure()
-                for t in data_all.columns:
-                    fig_comp.add_trace(go.Scatter(x=data_all.index, y=data_all[t], mode='lines', name=t))
-                fig_comp.update_layout(
-                    title="Closing Prices Comparison",
-                    xaxis_title="Date", yaxis_title="Price",
-                    template="plotly_white"
-                )
-                st.plotly_chart(fig_comp, use_container_width=True)
-
-    except Exception as e:
-        st.error(f"❌ Error fetching data: {e}")
+        # CSV export
+        csv = data.to_csv(index=False).encode('utf-8')
+        st.download_button("Download CSV", csv, file_name=f"{ticker}_data.csv", mime="text/csv")
