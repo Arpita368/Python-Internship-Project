@@ -4,8 +4,16 @@ import plotly.graph_objects as go
 from alpha_vantage.timeseries import TimeSeries
 from datetime import date
 
+# 🎨 Streamlit page config
 st.set_page_config(page_title="📈 Stock Analysis Dashboard", layout="wide")
-st.markdown("<h1 style='text-align: center; color: #2E86C1;'>📊 Stock Analysis Dashboard (Alpha Vantage Free)</h1>", unsafe_allow_html=True)
+st.markdown(
+    """
+    <h1 style='text-align: center; color: #1ABC9C; font-family: Arial, sans-serif;'>
+    📊 Stock Analysis Dashboard
+    </h1>
+    """,
+    unsafe_allow_html=True,
+)
 
 # Sidebar
 st.sidebar.header("⚙️ Input Options")
@@ -28,10 +36,21 @@ fetch_btn = st.sidebar.button("🚀 Fetch Data")
 API_KEY = "B6BAS1WJ9NKWU756"  # Replace with your free Alpha Vantage API key
 ts = TimeSeries(key=API_KEY, output_format='pandas')
 
+# 🎨 Custom Plotly theme
+custom_template = dict(
+    layout=go.Layout(
+        font=dict(family="Arial", size=14, color="#2C3E50"),
+        paper_bgcolor="#F9F9F9",
+        plot_bgcolor="#F9F9F9",
+        title=dict(font=dict(size=20, color="#1ABC9C")),
+        xaxis=dict(showgrid=True, gridcolor="#EAEDED"),
+        yaxis=dict(showgrid=True, gridcolor="#EAEDED")
+    )
+)
+
 if fetch_btn:
     try:
         ticker = popular_tickers[selected_ticker]
-        # ✅ FREE endpoint (daily data)
         data, meta = ts.get_daily(symbol=ticker, outputsize='full')
 
         # Clean columns
@@ -70,25 +89,34 @@ if fetch_btn:
                     open=df['Open'],
                     high=df['High'],
                     low=df['Low'],
-                    close=df['Close']
+                    close=df['Close'],
+                    increasing_line_color="#2ECC71",
+                    decreasing_line_color="#E74C3C"
                 )])
-                fig_candle.update_layout(xaxis_rangeslider_visible=False, template="plotly_white")
+                fig_candle.update_layout(xaxis_rangeslider_visible=False, template=custom_template)
                 st.plotly_chart(fig_candle, use_container_width=True)
 
             with tab2:
                 st.subheader(f"{ticker} Closing Price Line Chart")
                 fig_line = go.Figure()
-                fig_line.add_trace(go.Scatter(x=df.index, y=df['Close'], mode='lines', name='Close', line=dict(color="blue")))
-                fig_line.update_layout(xaxis_title="Date", yaxis_title="Price", template="plotly_white")
+                fig_line.add_trace(go.Scatter(
+                    x=df.index, y=df['Close'],
+                    mode='lines', name='Close',
+                    line=dict(color="#2980B9", width=2)
+                ))
+                fig_line.update_layout(xaxis_title="Date", yaxis_title="Price", template=custom_template)
                 st.plotly_chart(fig_line, use_container_width=True)
 
             with tab3:
                 st.subheader(f"{ticker} RSI (14-day)")
                 fig_rsi = go.Figure()
-                fig_rsi.add_trace(go.Scatter(x=df.index, y=df['RSI'], mode='lines', line=dict(color="purple")))
+                fig_rsi.add_trace(go.Scatter(
+                    x=df.index, y=df['RSI'],
+                    mode='lines', line=dict(color="#8E44AD", width=2)
+                ))
                 fig_rsi.add_hline(y=70, line_dash="dash", line_color="red")
                 fig_rsi.add_hline(y=30, line_dash="dash", line_color="green")
-                fig_rsi.update_layout(xaxis_title="Date", yaxis_title="RSI", template="plotly_white")
+                fig_rsi.update_layout(xaxis_title="Date", yaxis_title="RSI", template=custom_template)
                 st.plotly_chart(fig_rsi, use_container_width=True)
 
             with tab4:
