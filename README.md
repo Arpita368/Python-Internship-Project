@@ -57,8 +57,6 @@ Python-Internship-Project/
 
 ## ⚙️ Installation & Setup  
 
-## ⚙️ Installation & Setup  
-
 1. **Clone this repository**  
    ```bash
    git clone https://github.com/Arpita368/Python-Internship-Project.git
