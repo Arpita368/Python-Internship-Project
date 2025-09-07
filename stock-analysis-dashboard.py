@@ -50,10 +50,11 @@ st.markdown(
         color: #111111 !important; /* Dark text everywhere */
     }
 
-    /* Sidebar toggle (hamburger) fix for mobile */
-    [data-testid="stSidebarNav"] button[kind="header"] {
-        color: white !important;    
-        fill: white !important;   
+    /* Force sidebar (hamburger) icon to white */
+    [data-testid="stSidebarNav"] button[kind="header"] svg,
+    [data-testid="stSidebarNav"] svg {
+        fill: white !important;
+        color: white !important;
     }
 
     </style>
