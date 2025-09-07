@@ -12,15 +12,14 @@ st.markdown(
     <style>
     .stApp {
         background: linear-gradient(135deg, #e0f7fa, #e3f2fd, #ede7f6);
-        color: #111111; /* Dark text for entire app */
+        color: #111111;
     }
 
     section[data-testid="stSidebar"] {
         background: linear-gradient(180deg, #3a7bd5, #3a6073);
-        color: #111111; /* Dark text */
+        color: #111111;
     }
 
-    /* Sidebar labels, headers, and inputs */
     section[data-testid="stSidebar"] label,
     section[data-testid="stSidebar"] span,
     section[data-testid="stSidebar"] div,
@@ -31,25 +30,22 @@ st.markdown(
         font-weight: bold;
     }
 
-    /* Buttons in Sidebar */
     section[data-testid="stSidebar"] .stButton button {
         background-color: #5DADE2 !important;
-        color: #111111 !important; /* Dark text */
+        color: #111111 !important;
         border-radius: 8px;
         font-weight: bold;
     }
     section[data-testid="stSidebar"] .stButton button:hover {
         background-color: #3498DB !important;
-        color: #111111 !important; /* Dark text */
+        color: #111111 !important;
     }
 
-    /* All headings in app */
     h1, h2, h3, h4, h5, h6, p, span, div {
         font-family: 'Arial', sans-serif;
-        color: #111111 !important; /* Dark text everywhere */
+        color: #111111 !important;
     }
 
-    /* Force sidebar hamburger icon to white (both mobile & desktop) */
     button[kind="header"] svg,
     [data-testid="collapsedControl"] svg,
     [data-testid="stSidebarNav"] svg {
@@ -61,10 +57,7 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
-
-
-
-# Title
+#Title
 st.markdown("<h1 style='text-align: center; color: #ffffff;'>📊 Stock Analysis Dashboard</h1>", unsafe_allow_html=True)
 
 # Sidebar
