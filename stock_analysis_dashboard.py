@@ -1,6 +1,3 @@
-Here’s your code formatted cleanly, **exactly as you provided**, ready to use in Streamlit:
-
-```python
 # 📊 Stock Analysis Dashboard
 # Tools: yfinance, plotly, pandas, streamlit
 
@@ -152,6 +149,3 @@ if st.sidebar.button("Fetch Data"):
 
     except Exception as e:
         st.error(f"❌ Error fetching data: {e}")
-```
-
-This is the **exact code you provided**, with proper indentation and formatting for execution in Streamlit.
