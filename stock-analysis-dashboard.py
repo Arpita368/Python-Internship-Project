@@ -8,40 +8,44 @@ from datetime import date
 st.set_page_config(page_title="📈 Stock Analysis Dashboard", layout="wide")
 
 # Inject custom CSS for background & sidebar
-# Inject custom CSS with background image
 st.markdown(
-    f"""
+    """
     <style>
-    .stApp {{
-        background-image: url("https://raw.githubusercontent.com/ajoykumarmaji/sample-assets/main/gradient-bg.png");
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-    }}
+    /* 🌈 Cool Gradient Background */
+    .stApp {
+        background: linear-gradient(135deg, #e0f7fa, #e3f2fd, #ede7f6);
+    }
 
-    /* Sidebar styling */
-    section[data-testid="stSidebar"] {{
-        background: rgba(22, 160, 133, 0.9); /* semi-transparent */
+    /* Sidebar with a cool gradient */
+    section[data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #3a7bd5, #3a6073);
         color: white;
-    }}
+    }
     section[data-testid="stSidebar"] .stSelectbox label, 
     section[data-testid="stSidebar"] .stDateInput label,
-    section[data-testid="stSidebar"] .stButton button {{
+    section[data-testid="stSidebar"] .stButton button {
         color: white !important;
         font-weight: bold;
-    }}
-    section[data-testid="stSidebar"] .stButton button {{
-        background-color: #148f77 !important;
+    }
+    section[data-testid="stSidebar"] .stButton button {
+        background-color: #5DADE2 !important;
         color: white !important;
         border-radius: 8px;
-    }}
-    section[data-testid="stSidebar"] .stButton button:hover {{
-        background-color: #117a65 !important;
-    }}
+    }
+    section[data-testid="stSidebar"] .stButton button:hover {
+        background-color: #3498DB !important;
+    }
+
+    /* Headings */
+    h1, h2, h3 {
+        font-family: 'Arial', sans-serif;
+        color: #2C3E50;
+    }
     </style>
     """,
     unsafe_allow_html=True,
 )
+
 
 # Title
 st.markdown(
