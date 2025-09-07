@@ -4,11 +4,10 @@ import plotly.graph_objects as go
 from alpha_vantage.timeseries import TimeSeries
 from datetime import date
 
-# ---- CONFIG ----
 st.set_page_config(page_title="📈 Stock Analysis Dashboard", layout="wide")
-st.markdown("<h1 style='text-align: center; color: #2E86C1;'>📊 Stock Analysis Dashboard (Alpha Vantage)</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: #2E86C1;'>📊 Stock Analysis Dashboard (Alpha Vantage Free)</h1>", unsafe_allow_html=True)
 
-# ---- SIDEBAR ----
+# Sidebar
 st.sidebar.header("⚙️ Input Options")
 popular_tickers = {
     "Apple (AAPL)": "AAPL",
@@ -26,22 +25,22 @@ start_date = st.sidebar.date_input("Start Date", date(2023, 1, 1))
 end_date = st.sidebar.date_input("End Date", date.today())
 fetch_btn = st.sidebar.button("🚀 Fetch Data")
 
-# ---- ALPHA VANTAGE SETUP ----
-API_KEY = "B6BAS1WJ9NKWU756"  # 🔑 Replace with your free API key
+API_KEY = "YOUR_API_KEY"  # Replace with your free Alpha Vantage API key
 ts = TimeSeries(key=API_KEY, output_format='pandas')
 
 if fetch_btn:
     try:
         ticker = popular_tickers[selected_ticker]
-        data, meta = ts.get_daily_adjusted(symbol=ticker, outputsize='full')
+        # ✅ FREE endpoint (daily data)
+        data, meta = ts.get_daily(symbol=ticker, outputsize='full')
 
-        # Clean column names
+        # Clean columns
         data = data.rename(columns={
             '1. open': 'Open',
             '2. high': 'High',
             '3. low': 'Low',
             '4. close': 'Close',
-            '6. volume': 'Volume'
+            '5. volume': 'Volume'
         })
 
         data.index = pd.to_datetime(data.index)
@@ -51,7 +50,7 @@ if fetch_btn:
         if df.empty:
             st.error("⚠️ No data available for selected dates.")
         else:
-            # ---- RSI Calculation ----
+            # RSI calculation
             delta = df['Close'].diff()
             gain = delta.where(delta > 0, 0)
             loss = -delta.where(delta < 0, 0)
@@ -61,7 +60,7 @@ if fetch_btn:
             df['RSI'] = 100 - (100 / (1 + rs))
             df['RSI'].fillna(50, inplace=True)
 
-            # ---- Tabs ----
+            # Tabs
             tab1, tab2, tab3, tab4 = st.tabs(["📉 Candlestick", "📈 Line Chart", "📊 RSI", "📑 Summary"])
 
             with tab1:
@@ -102,7 +101,6 @@ if fetch_btn:
                 col2.metric("End Price", f"${end_price:.2f}")
                 col3.metric("Return %", f"{ret:.2f}%")
 
-            # CSV Export
             st.download_button(
                 label="💾 Download Data as CSV",
                 data=df.to_csv().encode('utf-8'),
