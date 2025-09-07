@@ -25,7 +25,7 @@ start_date = st.sidebar.date_input("Start Date", date(2023, 1, 1))
 end_date = st.sidebar.date_input("End Date", date.today())
 fetch_btn = st.sidebar.button("🚀 Fetch Data")
 
-API_KEY = "YOUR_API_KEY"  # Replace with your free Alpha Vantage API key
+API_KEY = "B6BAS1WJ9NKWU756"  # Replace with your free Alpha Vantage API key
 ts = TimeSeries(key=API_KEY, output_format='pandas')
 
 if fetch_btn:
