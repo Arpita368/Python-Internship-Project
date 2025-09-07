@@ -11,7 +11,6 @@ st.set_page_config(page_title="📈 Stock Analysis Dashboard", layout="wide")
 st.markdown(
     """
     <style>
-    /* Keep background gradients */
     .stApp {
         background: linear-gradient(135deg, #e0f7fa, #e3f2fd, #ede7f6);
         color: #111111; /* Dark text for entire app */
@@ -50,6 +49,13 @@ st.markdown(
         font-family: 'Arial', sans-serif;
         color: #111111 !important; /* Dark text everywhere */
     }
+
+    /* Sidebar toggle (hamburger) fix for mobile */
+    [data-testid="stSidebarNav"] button[kind="header"] {
+        color: white !important;    
+        fill: white !important;   
+    }
+
     </style>
     """,
     unsafe_allow_html=True,
