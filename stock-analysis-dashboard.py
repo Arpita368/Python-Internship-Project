@@ -53,6 +53,7 @@ if st.sidebar.button("Fetch Data"):
 
                 tab1, tab2, tab3, tab4 = st.tabs(["Closing Price", "Volume", "RSI", "Summary"])
 
+                df = data.reset_index()
                 # Closing price line chart
                 with tab1:
                     fig1 = go.Figure()
