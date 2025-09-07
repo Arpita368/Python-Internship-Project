@@ -3,6 +3,6 @@ requests
 matplotlib
 
 streamlit
-yfinance
 pandas
 plotly
+alpha_vantage
