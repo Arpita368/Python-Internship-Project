@@ -5,12 +5,12 @@ import streamlit as st
 import yfinance as yf
 import pandas as pd
 import plotly.graph_objects as go
+from datetime import date
 
 # ---------------------------
 # Page Config
 # ---------------------------
 st.set_page_config(page_title="📊 Stock Analysis Dashboard", layout="wide")
-
 st.title("📊 Stock Analysis Dashboard")
 
 # ---------------------------
@@ -18,14 +18,15 @@ st.title("📊 Stock Analysis Dashboard")
 # ---------------------------
 st.sidebar.header("Stock Input Options")
 ticker = st.sidebar.text_input("Enter Stock Ticker (e.g., AAPL, TSLA, INFY.BO):", "AAPL").upper()
-start_date = st.sidebar.text_input("Start Date", "2023-01-01")
-end_date = st.sidebar.text_input("End Date", "2025-09-07")
+
+start_date = st.sidebar.date_input("Start Date", date(2023, 1, 1))
+end_date = st.sidebar.date_input("End Date", date.today())
 
 if st.sidebar.button("Fetch Data"):
-    # ---------------------------
-    # Fetch historical data
-    # ---------------------------
     try:
+        # ---------------------------
+        # Fetch historical data
+        # ---------------------------
         data = yf.download(ticker, start=start_date, end=end_date)
 
         if data.empty:
@@ -46,11 +47,14 @@ if st.sidebar.button("Fetch Data"):
             avg_loss = loss.rolling(14).mean()
             rs = avg_gain / avg_loss
             data['RSI'] = 100 - (100 / (1 + rs))
+            data['RSI'].fillna(50, inplace=True)  # default neutral RSI
 
             # ---------------------------
             # Tabs for charts & summary
             # ---------------------------
-            tab1, tab2, tab3, tab4 = st.tabs(["📈 Candlestick", "📊 SMA & EMA", "📉 RSI", "📋 Summary"])
+            tab1, tab2, tab3, tab4 = st.tabs(
+                ["📈 Candlestick", "📊 SMA & EMA", "📉 RSI", "📋 Summary"]
+            )
 
             # --- Candlestick ---
             with tab1:
@@ -87,21 +91,20 @@ if st.sidebar.button("Fetch Data"):
 
             # --- Summary ---
             with tab4:
-                if not data.empty and "Close" in data:
-                    close_prices = data["Close"].dropna()
-                    if not close_prices.empty:
-                        start_price = close_prices.iloc[0]
-                        end_price = close_prices.iloc[-1]
-                        ret = ((end_price / start_price) - 1) * 100
+                close_prices = data["Close"].dropna()
+                if not close_prices.empty:
+                    start_price = float(close_prices.iloc[0])
+                    end_price = float(close_prices.iloc[-1])
+                    ret = ((end_price / start_price) - 1) * 100
 
-                        col1, col2, col3 = st.columns(3)
-                        col1.metric("Start Price", f"{start_price:.2f}")
-                        col2.metric("End Price", f"{end_price:.2f}")
-                        col3.metric("Return %", f"{ret:.2f}%")
-                    else:
-                        st.warning("⚠️ No valid closing prices to summarize.")
+                    col1, col2, col3, col4, col5 = st.columns(5)
+                    col1.metric("Start Price", f"{start_price:.2f}")
+                    col2.metric("End Price", f"{end_price:.2f}")
+                    col3.metric("Return %", f"{ret:.2f}%")
+                    col4.metric("SMA20 (last)", f"{float(data['SMA20'].iloc[-1]):.2f}" if pd.notna(data['SMA20'].iloc[-1]) else "N/A")
+                    col5.metric("EMA20 (last)", f"{float(data['EMA20'].iloc[-1]):.2f}" if pd.notna(data['EMA20'].iloc[-1]) else "N/A")
                 else:
-                    st.warning("⚠️ No valid stock data available for summary.")
+                    st.warning("⚠️ No valid closing prices to summarize.")
 
             # ---------------------------
             # CSV Export Option
