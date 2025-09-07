@@ -8,28 +8,36 @@ from datetime import date
 st.set_page_config(page_title="📈 Stock Analysis Dashboard", layout="wide")
 
 # Background gradient + sidebar style
-st.markdown("""
+st.markdown(
+    """
     <style>
-        body {
-            background: linear-gradient(135deg, #1f4037, #99f2c8);
-        }
-        .sidebar .sidebar-content {
-            background: linear-gradient(180deg, #141E30, #243B55);
-            color: white;
-        }
-        .sidebar .sidebar-content h2, .sidebar .sidebar-content label, .sidebar .sidebar-content span {
-            color: white !important;
-            font-weight: bold;
-        }
-        .stButton button {
-            background: linear-gradient(to right, #06beb6, #48b1bf);
-            color: white;
-            border-radius: 12px;
-            padding: 0.6em 1.2em;
-            font-weight: bold;
-        }
+    .stApp {
+        background: linear-gradient(135deg, #e0f7fa, #e3f2fd, #ede7f6);
+    }
+    section[data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #3a7bd5, #3a6073);
+        color: white;
+    }
+    section[data-testid="stSidebar"] label {
+        color: white !important;
+        font-weight: bold;
+    }
+    section[data-testid="stSidebar"] .stButton button {
+        background-color: #5DADE2 !important;
+        color: white !important;
+        border-radius: 8px;
+    }
+    section[data-testid="stSidebar"] .stButton button:hover {
+        background-color: #3498DB !important;
+    }
+    h1, h2, h3 {
+        font-family: 'Arial', sans-serif;
+        color: #2C3E50;
+    }
     </style>
-""", unsafe_allow_html=True)
+    """,
+    unsafe_allow_html=True,
+)
 
 # Title
 st.markdown("<h1 style='text-align: center; color: #ffffff;'>📊 Stock Analysis Dashboard</h1>", unsafe_allow_html=True)
