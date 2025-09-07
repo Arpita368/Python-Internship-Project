@@ -7,45 +7,54 @@ from datetime import date
 # Page config
 st.set_page_config(page_title="📈 Stock Analysis Dashboard", layout="wide")
 
-st.markdown("""
+# Custom CSS
+st.markdown(
+    """
     <style>
-        /* Background Gradient */
-        body {
-            background: linear-gradient(135deg, #d9f2ff, #ffffff);
-            color: #111111; /* Dark text */
-        }
-        
-        /* Sidebar background */
-        .sidebar .sidebar-content {
-            background: linear-gradient(180deg, #e6f0ff, #ffffff);
-            color: #111111;
-        }
-        
-        /* Sidebar labels, headers, etc. */
-        .sidebar .sidebar-content h2,
-        .sidebar .sidebar-content label,
-        .sidebar .sidebar-content span,
-        .sidebar .sidebar-content div {
-            color: #111111 !important;
-            font-weight: bold;
-        }
+    /* Keep background gradients */
+    .stApp {
+        background: linear-gradient(135deg, #e0f7fa, #e3f2fd, #ede7f6);
+        color: #111111; /* Dark text for entire app */
+    }
 
-        /* App title */
-        h1, h2, h3, h4, h5, h6, p, span, div {
-            color: #111111 !important;
-        }
+    section[data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #3a7bd5, #3a6073);
+        color: #111111; /* Dark text */
+    }
 
-        /* Buttons */
-        .stButton button {
-            background: linear-gradient(to right, #06beb6, #48b1bf);
-            color: #111111;
-            border-radius: 12px;
-            padding: 0.6em 1.2em;
-            font-weight: bold;
-            border: 1px solid #333333;
-        }
+    /* Sidebar labels, headers, and inputs */
+    section[data-testid="stSidebar"] label,
+    section[data-testid="stSidebar"] span,
+    section[data-testid="stSidebar"] div,
+    section[data-testid="stSidebar"] h1,
+    section[data-testid="stSidebar"] h2,
+    section[data-testid="stSidebar"] h3 {
+        color: #111111 !important;
+        font-weight: bold;
+    }
+
+    /* Buttons in Sidebar */
+    section[data-testid="stSidebar"] .stButton button {
+        background-color: #5DADE2 !important;
+        color: #111111 !important; /* Dark text */
+        border-radius: 8px;
+        font-weight: bold;
+    }
+    section[data-testid="stSidebar"] .stButton button:hover {
+        background-color: #3498DB !important;
+        color: #111111 !important; /* Dark text */
+    }
+
+    /* All headings in app */
+    h1, h2, h3, h4, h5, h6, p, span, div {
+        font-family: 'Arial', sans-serif;
+        color: #111111 !important; /* Dark text everywhere */
+    }
     </style>
-""", unsafe_allow_html=True)
+    """,
+    unsafe_allow_html=True,
+)
+
 
 
 # Title
