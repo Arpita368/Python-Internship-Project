@@ -3,7 +3,7 @@ import streamlit as st
 import yfinance as yf
 import pandas as pd
 import plotly.graph_objects as go
-from datetime import date
+from datetime import date, timedelta
 
 # Page Config
 st.set_page_config(page_title="📊 Stock Analysis Dashboard", layout="wide")
@@ -38,16 +38,26 @@ if st.sidebar.button("Fetch Data"):
 
         if len(tickers) == 1:
             ticker = tickers[0]
-            data = yf.download(ticker, start=start_date, end=end_date)
+            # Ensure end_date is not in the future
+            if end_date > date.today():
+                end_date = date.today() - timedelta(days=1)
+
+            # Fetch data
+            data = yf.download(
+                ticker, start=start_date, end=end_date,
+                progress=False, threads=False
+            )
+
             if data.empty:
-                st.error("⚠️ No data found for this stock.")
+                st.error("⚠️ No data found for this stock and date range.")
             else:
-                # Ensure datetime index
-                data.index = pd.to_datetime(data.index)
+                # Reset index to use Date column in plots
+                data.reset_index(inplace=True)
 
                 # Calculate indicators
                 data['SMA20'] = data['Close'].rolling(window=20).mean()
                 data['EMA20'] = data['Close'].ewm(span=20, adjust=False).mean()
+
                 delta = data['Close'].diff()
                 gain = delta.where(delta > 0, 0)
                 loss = -delta.where(delta < 0, 0)
@@ -63,7 +73,7 @@ if st.sidebar.button("Fetch Data"):
                 # Candlestick
                 with tab1:
                     fig1 = go.Figure(data=[go.Candlestick(
-                        x=data.index,
+                        x=data['Date'],
                         open=data['Open'],
                         high=data['High'],
                         low=data['Low'],
@@ -75,16 +85,18 @@ if st.sidebar.button("Fetch Data"):
                 # SMA & EMA
                 with tab2:
                     fig2 = go.Figure()
-                    fig2.add_trace(go.Scatter(x=data.index, y=data['Close'], mode='lines', name='Close'))
-                    fig2.add_trace(go.Scatter(x=data.index, y=data['SMA20'], mode='lines', name='SMA20'))
-                    fig2.add_trace(go.Scatter(x=data.index, y=data['EMA20'], mode='lines', name='EMA20'))
+                    fig2.add_trace(go.Scatter(x=data['Date'], y=data['Close'], mode='lines', name='Close'))
+                    if not data['SMA20'].isna().all():
+                        fig2.add_trace(go.Scatter(x=data['Date'], y=data['SMA20'], mode='lines', name='SMA20'))
+                    if not data['EMA20'].isna().all():
+                        fig2.add_trace(go.Scatter(x=data['Date'], y=data['EMA20'], mode='lines', name='EMA20'))
                     fig2.update_layout(title=f"{ticker} Close with SMA & EMA")
                     st.plotly_chart(fig2, use_container_width=True)
 
                 # RSI
                 with tab3:
                     fig3 = go.Figure()
-                    fig3.add_trace(go.Scatter(x=data.index, y=data['RSI'], mode='lines', name='RSI'))
+                    fig3.add_trace(go.Scatter(x=data['Date'], y=data['RSI'], mode='lines', name='RSI'))
                     fig3.add_hline(y=70, line_dash="dash", line_color="red")
                     fig3.add_hline(y=30, line_dash="dash", line_color="green")
                     fig3.update_layout(title=f"{ticker} RSI (14-day)")
@@ -93,18 +105,21 @@ if st.sidebar.button("Fetch Data"):
                 # Summary
                 with tab4:
                     close_prices = data['Close'].dropna()
-                    start_price = float(close_prices.iloc[0])
-                    end_price = float(close_prices.iloc[-1])
-                    ret = ((end_price / start_price) - 1) * 100
-                    col1, col2, col3 = st.columns(3)
-                    col1.metric("Start Price", f"{start_price:.2f}")
-                    col2.metric("End Price", f"{end_price:.2f}")
-                    col3.metric("Return %", f"{ret:.2f}%")
+                    if not close_prices.empty:
+                        start_price = float(close_prices.iloc[0])
+                        end_price = float(close_prices.iloc[-1])
+                        ret = ((end_price / start_price) - 1) * 100
+                        col1, col2, col3 = st.columns(3)
+                        col1.metric("Start Price", f"{start_price:.2f}")
+                        col2.metric("End Price", f"{end_price:.2f}")
+                        col3.metric("Return %", f"{ret:.2f}%")
+                    else:
+                        st.warning("No closing prices available for summary.")
 
                 # CSV export
                 st.download_button(
                     label="💾 Download Data as CSV",
-                    data=data.to_csv().encode('utf-8'),
+                    data=data.to_csv(index=False).encode('utf-8'),
                     file_name=f"{ticker}_stock_analysis.csv",
                     mime="text/csv",
                 )
@@ -112,13 +127,19 @@ if st.sidebar.button("Fetch Data"):
         # Multi-stock comparison if >1 ticker selected
         elif len(tickers) > 1:
             st.subheader("📊 Multi-Stock Comparison")
+            if end_date > date.today():
+                end_date = date.today() - timedelta(days=1)
+
             data_all = yf.download(tickers, start=start_date, end=end_date)['Close']
             if not data_all.empty:
+                data_all.reset_index(inplace=True)
                 fig_comp = go.Figure()
-                for t in data_all.columns:
-                    fig_comp.add_trace(go.Scatter(x=data_all.index, y=data_all[t], mode='lines', name=t))
+                for t in data_all.columns[1:]:
+                    fig_comp.add_trace(go.Scatter(x=data_all['Date'], y=data_all[t], mode='lines', name=t))
                 fig_comp.update_layout(title="Closing Prices Comparison", xaxis_title="Date", yaxis_title="Price")
                 st.plotly_chart(fig_comp, use_container_width=True)
+            else:
+                st.error("⚠️ No data found for selected stocks.")
 
     except Exception as e:
         st.error(f"❌ Error fetching data: {e}")
