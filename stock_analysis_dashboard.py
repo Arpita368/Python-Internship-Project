@@ -47,41 +47,45 @@ if st.sidebar.button("Fetch Data"):
         # ---------------------------
         # Multi-stock comparison
         # ---------------------------
-        st.subheader("📊 Multi-Stock Comparison")
+        if len(tickers) > 1:
+            st.subheader("📊 Multi-Stock Comparison")
 
-        data_all = yf.download(tickers, start=start_date, end=end_date)["Close"]
+            data_all = yf.download(tickers, start=start_date, end=end_date)["Close"]
 
-        if data_all.empty:
-            st.error("⚠️ No data found. Please check ticker(s) or date range.")
-        else:
-            # Line chart for closing prices
-            fig_comp = go.Figure()
-            for t in data_all.columns:
-                fig_comp.add_trace(go.Scatter(x=data_all.index, y=data_all[t], mode="lines", name=t))
-            fig_comp.update_layout(title="Closing Prices Comparison", xaxis_title="Date", yaxis_title="Price")
-            st.plotly_chart(fig_comp, use_container_width=True)
+            if data_all.empty:
+                st.error("⚠️ No data found. Please check ticker(s) or date range.")
+            else:
+                # Line chart for closing prices
+                fig_comp = go.Figure()
+                for t in data_all.columns:
+                    fig_comp.add_trace(go.Scatter(x=data_all.index, y=data_all[t], mode="lines", name=t))
+                fig_comp.update_layout(title="Closing Prices Comparison", xaxis_title="Date", yaxis_title="Price")
+                st.plotly_chart(fig_comp, use_container_width=True)
 
-            # Performance summary
-            st.subheader("📋 Performance Summary")
-            summary = {}
-            for t in data_all.columns:
-                start_price = float(data_all[t].dropna().iloc[0])
-                end_price = float(data_all[t].dropna().iloc[-1])
-                ret = ((end_price / start_price) - 1) * 100
-                summary[t] = {"Start Price": start_price, "End Price": end_price, "Return %": ret}
+                # Performance summary
+                st.subheader("📋 Performance Summary")
+                summary = {}
+                for t in data_all.columns:
+                    start_price = float(data_all[t].dropna().iloc[0])
+                    end_price = float(data_all[t].dropna().iloc[-1])
+                    ret = ((end_price / start_price) - 1) * 100
+                    summary[t] = {"Start Price": start_price, "End Price": end_price, "Return %": ret}
 
-            df_summary = pd.DataFrame(summary).T
-            st.dataframe(df_summary.style.format({"Start Price": "{:.2f}", "End Price": "{:.2f}", "Return %": "{:.2f}%"}))
+                df_summary = pd.DataFrame(summary).T
+                st.dataframe(df_summary.style.format({"Start Price": "{:.2f}", "End Price": "{:.2f}", "Return %": "{:.2f}%"}))
 
-            # ---------------------------
-            # Single stock deep analysis
-            # ---------------------------
-            if len(tickers) == 1:
-                ticker = tickers[0]
-                st.subheader(f"🔍 Detailed Analysis for {ticker}")
+        # ---------------------------
+        # Single-stock detailed analysis (Tabs)
+        # ---------------------------
+        if len(tickers) == 1:
+            ticker = tickers[0]
+            st.subheader(f"🔍 Detailed Analysis for {ticker}")
 
-                data = yf.download(ticker, start=start_date, end=end_date)
+            data = yf.download(ticker, start=start_date, end=end_date)
 
+            if data.empty:
+                st.error("⚠️ No data found. Please check ticker or date range.")
+            else:
                 # Indicators
                 data['SMA20'] = data['Close'].rolling(window=20).mean()
                 data['EMA20'] = data['Close'].ewm(span=20, adjust=False).mean()
@@ -95,6 +99,7 @@ if st.sidebar.button("Fetch Data"):
                 data['RSI'] = 100 - (100 / (1 + rs))
                 data['RSI'].fillna(50, inplace=True)
 
+                # Tabs
                 tab1, tab2, tab3, tab4 = st.tabs(["📈 Candlestick", "📊 SMA & EMA", "📉 RSI", "📋 Summary"])
 
                 # --- Candlestick ---
@@ -114,8 +119,10 @@ if st.sidebar.button("Fetch Data"):
                 with tab2:
                     fig2 = go.Figure()
                     fig2.add_trace(go.Scatter(x=data.index, y=data['Close'], mode='lines', name='Close'))
-                    fig2.add_trace(go.Scatter(x=data.index, y=data['SMA20'], mode='lines', name='SMA20'))
-                    fig2.add_trace(go.Scatter(x=data.index, y=data['EMA20'], mode='lines', name='EMA20'))
+                    if data['SMA20'].notna().sum() > 0:
+                        fig2.add_trace(go.Scatter(x=data.index, y=data['SMA20'], mode='lines', name='SMA20'))
+                    if data['EMA20'].notna().sum() > 0:
+                        fig2.add_trace(go.Scatter(x=data.index, y=data['EMA20'], mode='lines', name='EMA20'))
                     fig2.update_layout(title=f"{ticker} Closing Price with SMA & EMA")
                     st.plotly_chart(fig2, use_container_width=True)
 
@@ -132,8 +139,8 @@ if st.sidebar.button("Fetch Data"):
                 with tab4:
                     close_prices = data["Close"].dropna()
                     if not close_prices.empty:
-                        start_price = float(close_prices.iloc[0])
-                        end_price = float(close_prices.iloc[-1])
+                        start_price = close_prices.iloc[0]
+                        end_price = close_prices.iloc[-1]
                         ret = ((end_price / start_price) - 1) * 100
 
                         col1, col2, col3 = st.columns(3)
