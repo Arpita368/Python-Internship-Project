@@ -7,7 +7,6 @@ from datetime import date
 # Page config
 st.set_page_config(page_title="📈 Stock Analysis Dashboard", layout="wide")
 
-# Custom CSS
 st.markdown(
     """
     <style>
@@ -50,13 +49,14 @@ st.markdown(
         color: #111111 !important; /* Dark text everywhere */
     }
 
-    /* Force sidebar (hamburger) icon to white */
-    [data-testid="stSidebarNav"] button[kind="header"] svg,
+    /* Force sidebar hamburger icon to white (both mobile & desktop) */
+    button[kind="header"] svg,
+    [data-testid="collapsedControl"] svg,
     [data-testid="stSidebarNav"] svg {
         fill: white !important;
         color: white !important;
+        stroke: white !important;
     }
-
     </style>
     """,
     unsafe_allow_html=True,
