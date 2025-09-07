@@ -6,12 +6,48 @@ from datetime import date
 
 # 🎨 Streamlit page config
 st.set_page_config(page_title="📈 Stock Analysis Dashboard", layout="wide")
+
+# Inject custom CSS for background & sidebar
 st.markdown(
     """
-    <h1 style='text-align: center; color: #1ABC9C; font-family: Arial, sans-serif;'>
-    📊 Stock Analysis Dashboard
-    </h1>
+    <style>
+    /* 🌈 Gradient background */
+    .stApp {
+        background: linear-gradient(to right, #f4f9ff, #e6f7ff, #f4f9ff);
+    }
+
+    /* Sidebar styling */
+    section[data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #1abc9c, #16a085);
+        color: white;
+    }
+    section[data-testid="stSidebar"] .stSelectbox label, 
+    section[data-testid="stSidebar"] .stDateInput label,
+    section[data-testid="stSidebar"] .stButton button {
+        color: white !important;
+        font-weight: bold;
+    }
+    section[data-testid="stSidebar"] .stButton button {
+        background-color: #148f77 !important;
+        color: white !important;
+        border-radius: 8px;
+    }
+    section[data-testid="stSidebar"] .stButton button:hover {
+        background-color: #117a65 !important;
+    }
+
+    /* Headings */
+    h1, h2, h3 {
+        font-family: 'Arial', sans-serif;
+    }
+    </style>
     """,
+    unsafe_allow_html=True,
+)
+
+# Title
+st.markdown(
+    "<h1 style='text-align: center; color: #148f77;'>📊 Stock Analysis Dashboard</h1>",
     unsafe_allow_html=True,
 )
 
@@ -40,11 +76,11 @@ ts = TimeSeries(key=API_KEY, output_format='pandas')
 custom_template = dict(
     layout=go.Layout(
         font=dict(family="Arial", size=14, color="#2C3E50"),
-        paper_bgcolor="#F9F9F9",
-        plot_bgcolor="#F9F9F9",
-        title=dict(font=dict(size=20, color="#1ABC9C")),
-        xaxis=dict(showgrid=True, gridcolor="#EAEDED"),
-        yaxis=dict(showgrid=True, gridcolor="#EAEDED")
+        paper_bgcolor="rgba(255,255,255,0)",
+        plot_bgcolor="rgba(255,255,255,0)",
+        title=dict(font=dict(size=20, color="#148f77")),
+        xaxis=dict(showgrid=True, gridcolor="#D6DBDF"),
+        yaxis=dict(showgrid=True, gridcolor="#D6DBDF")
     )
 )
 
@@ -80,7 +116,9 @@ if fetch_btn:
             df['RSI'].fillna(50, inplace=True)
 
             # Tabs
-            tab1, tab2, tab3, tab4 = st.tabs(["📉 Candlestick", "📈 Line Chart", "📊 RSI", "📑 Summary"])
+            tab1, tab2, tab3, tab4 = st.tabs(
+                ["📉 Candlestick", "📈 Line Chart", "📊 RSI", "📑 Summary"]
+            )
 
             with tab1:
                 st.subheader(f"{ticker} Candlestick Chart")
